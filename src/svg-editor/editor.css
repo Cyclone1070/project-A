@@ -1,0 +1,9 @@
+.editor {
+    display: grid;
+    grid-template: 1fr / 50px 1fr 50px;
+    height: 100vh;
+}
+.tool-bar {
+    display: flex;
+    flex-direction: column;
+}
