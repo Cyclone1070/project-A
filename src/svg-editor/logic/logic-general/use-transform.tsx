@@ -1,5 +1,6 @@
 import { FinalSvg } from "../../types";
 import RectTransformNode from "./transform-nodes/rect-transforn-node";
+import EllipseTransformNode from "./transform-nodes/ellipse-transform-node";
 import { useEffect, useRef, useState } from "react";
 
 const useTransform = (
@@ -10,6 +11,7 @@ const useTransform = (
     const isDragging = useRef(false);
     const stopClickEvent = useRef(false); /* onClick trigger when drag by default */
     const rectIndex = useRef(-1);
+    const ellipseIndex = useRef(-1);
     const [start, setStart] = useState<{ x?: number; y?: number; nodeType?: string }>({});
     const [transformNode, setTransformNode] = useState(<></>);
 
@@ -18,7 +20,6 @@ const useTransform = (
         if (!stopClickEvent.current) {
             if (
                 (e.target as HTMLElement).tagName === "rect" &&
-                /* check for transform node */
                 !(e.target as HTMLElement).classList.contains("rect-transform-node")
             ) {
                 rectIndex.current = finalSvg.findIndex(
@@ -26,6 +27,16 @@ const useTransform = (
                 );
                 setTransformNode(
                     <RectTransformNode finalSvg={finalSvg} rectIndex={rectIndex.current} />
+                );
+            } else if (
+                (e.target as HTMLElement).tagName === "ellipse" &&
+                !(e.target as HTMLElement).classList.contains("ellipse-transform-node")
+            ) {
+                ellipseIndex.current = finalSvg.findIndex(
+                    (ellipse) => ellipse.id === (e.target as HTMLElement).id
+                );
+                setTransformNode(
+                    <EllipseTransformNode finalSvg={finalSvg} ellipseIndex={ellipseIndex.current} />
                 );
             } else if ((e.target as HTMLElement).tagName === "svg") {
                 setTransformNode(<></>);
