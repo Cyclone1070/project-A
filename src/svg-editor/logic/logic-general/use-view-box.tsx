@@ -13,8 +13,8 @@ const useViewBox = () => {
         function changeSize() {
             if (sizeRef.current) {
                 setSize({
-                    width: sizeRef.current.width.baseVal.value,
-                    height: sizeRef.current.height.baseVal.value,
+                    width: sizeRef.current.getBoundingClientRect().width,
+                    height: sizeRef.current.getBoundingClientRect().height,
                 });
             }
         }
