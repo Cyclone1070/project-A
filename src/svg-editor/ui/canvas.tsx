@@ -1,4 +1,4 @@
-import useCanvasSize from "../logic/logic-general/use-canvas-size";
+import useViewBox from "../logic/logic-general/use-view-box";
 
 interface props {
     children: React.ReactNode;
@@ -6,7 +6,7 @@ interface props {
 }
 
 const Canvas = ({ children, drawEvent }: props) => {
-    const { size, sizeRef } = useCanvasSize();
+    const { size, sizeRef } = useViewBox();
 
     return (
         <svg

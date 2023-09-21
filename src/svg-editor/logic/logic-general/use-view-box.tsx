@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const useCanvasSize = () => {
+const useViewBox = () => {
     const [size, setSize] = useState({ width: 0, height: 0 });
     const sizeRef = useRef<SVGSVGElement>(null);
 
@@ -25,4 +25,4 @@ const useCanvasSize = () => {
     return { size, sizeRef };
 };
 
-export default useCanvasSize;
+export default useViewBox;
