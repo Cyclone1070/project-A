@@ -20,7 +20,7 @@ export interface Ellipse {
     stroke?: string;
     strokeWidth?: number;
 }
-interface SingleFinalSvg extends Rect{
+interface SingleFinalSvg extends Rect, Ellipse{
     id?: string
 }
 export interface FinalSvg extends Array<SingleFinalSvg>{}

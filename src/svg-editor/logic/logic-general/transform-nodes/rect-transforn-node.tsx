@@ -17,7 +17,7 @@ const RectTransformNode = ({ finalSvg, rectIndex }: props) => {
     return (
         <>
             <line
-                className="rect-transform-node"
+                className="rect-transform-node transform-node"
                 id="cross"
                 x1={finalSvg[rectIndex].x! + finalSvg[rectIndex].width! / 2}
                 y1={finalSvg[rectIndex].y! + finalSvg[rectIndex].height! / 2 - 5}
@@ -27,7 +27,7 @@ const RectTransformNode = ({ finalSvg, rectIndex }: props) => {
                 strokeWidth="2"
             />
             <line
-                className="rect-transform-node"
+                className="rect-transform-node transform-node"
                 id="cross"
                 x1={finalSvg[rectIndex].x! + finalSvg[rectIndex].width! / 2 - 5}
                 y1={finalSvg[rectIndex].y! + finalSvg[rectIndex].height! / 2}
@@ -37,49 +37,49 @@ const RectTransformNode = ({ finalSvg, rectIndex }: props) => {
                 strokeWidth="2"
             />
             <rect
-                className="rect-transform-node"
+                className="rect-transform-node transform-node"
                 id="left"
                 x={finalSvg[rectIndex].x! - template.width / 2}
                 y={finalSvg[rectIndex].y! + finalSvg[rectIndex].height! / 2 - template.width / 2}
                 {...template}
             />
             <rect
-                className="rect-transform-node"
+                className="rect-transform-node transform-node"
                 id="right"
                 x={finalSvg[rectIndex].x! + finalSvg[rectIndex].width! - template.width / 2}
                 y={finalSvg[rectIndex].y! + finalSvg[rectIndex].height! / 2 - template.width / 2}
                 {...template}
             />
             <rect
-                className="rect-transform-node"
+                className="rect-transform-node transform-node"
                 id="bottom-left"
                 x={finalSvg[rectIndex].x! - template.width / 2}
                 y={finalSvg[rectIndex].y! + finalSvg[rectIndex].height! - template.width / 2}
                 {...template}
             />
             <rect
-                className="rect-transform-node"
+                className="rect-transform-node transform-node"
                 id="bottom"
                 x={finalSvg[rectIndex].x! + finalSvg[rectIndex].width! / 2 - template.width / 2}
                 y={finalSvg[rectIndex].y! + finalSvg[rectIndex].height! - template.width / 2}
                 {...template}
             />
             <rect
-                className="rect-transform-node"
+                className="rect-transform-node transform-node"
                 id="bottom-right"
                 x={finalSvg[rectIndex].x! + finalSvg[rectIndex].width! - template.width / 2}
                 y={finalSvg[rectIndex].y! + finalSvg[rectIndex].height! - template.width / 2}
                 {...template}
             />
             <rect
-                className="rect-transform-node"
+                className="rect-transform-node transform-node"
                 id="top-left"
                 x={finalSvg[rectIndex].x! - template.width / 2}
                 y={finalSvg[rectIndex].y! - template.width / 2}
                 {...template}
             />
             <rect
-                className="rect-transform-node"
+                className="rect-transform-node transform-node"
                 id="top"
                 x={finalSvg[rectIndex].x! + finalSvg[rectIndex].width! / 2 - template.width / 2}
                 y={finalSvg[rectIndex].y! - template.width / 2}
@@ -87,7 +87,7 @@ const RectTransformNode = ({ finalSvg, rectIndex }: props) => {
             />
 
             <rect
-                className="rect-transform-node"
+                className="rect-transform-node transform-node"
                 id="top-right"
                 x={finalSvg[rectIndex].x! + finalSvg[rectIndex].width! - template.width / 2}
                 y={finalSvg[rectIndex].y! - template.width / 2}
