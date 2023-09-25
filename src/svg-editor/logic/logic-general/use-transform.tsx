@@ -1,11 +1,12 @@
 import { FinalSvg } from "../../types";
 import RectTransformNode from "./transform-nodes/rect-transforn-node";
 import EllipseTransformNode from "./transform-nodes/ellipse-transform-node";
+import { handleKeyDown } from "./keyboardShorcut";
 import { useEffect, useRef, useState } from "react";
 
 const useTransform = (
     finalSvg: FinalSvg,
-    setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>,
+    setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>,
     drawMode: string
 ) => {
     const isDragging = useRef(false);
@@ -40,6 +41,7 @@ const useTransform = (
             );
         } else if ((e.target as HTMLElement).tagName === "svg") {
             setTransformNode(<></>);
+            targetIndex.current = -1;
         }
     }
     /* handle events */
@@ -141,9 +143,10 @@ const useTransform = (
                 });
             }
         } else if (
-            finalSvg[targetIndex.current] &&
-            (e.target as HTMLElement).id === finalSvg[targetIndex.current].id &&
-            (e.target as HTMLElement).tagName === "rect"
+            (finalSvg[targetIndex.current] &&
+                (e.target as HTMLElement).id === finalSvg[targetIndex.current].id &&
+                (e.target as HTMLElement).tagName === "rect") ||
+            (e.target as HTMLElement).classList.contains("rect-cross")
         ) {
             isDragging.current = true;
             setStart({
@@ -152,9 +155,10 @@ const useTransform = (
                 eventType: "drag",
             });
         } else if (
-            finalSvg[targetIndex.current] &&
-            (e.target as HTMLElement).id === finalSvg[targetIndex.current].id &&
-            (e.target as HTMLElement).tagName === "ellipse"
+            (finalSvg[targetIndex.current] &&
+                (e.target as HTMLElement).id === finalSvg[targetIndex.current].id &&
+                (e.target as HTMLElement).tagName === "ellipse") ||
+            (e.target as HTMLElement).classList.contains("ellipse-cross")
         ) {
             isDragging.current = true;
             setStart({
@@ -164,7 +168,7 @@ const useTransform = (
             });
         }
     }
-    function handleResize(e: React.MouseEvent) {
+    function handleTransform(e: React.MouseEvent) {
         if (isDragging.current) {
             if (targetType.current === "rect") {
                 if (start.eventType === "height") {
@@ -266,16 +270,26 @@ const useTransform = (
 
     const transformEvent = {
         onMouseDown: dragStart,
-        onMouseMove: handleResize,
+        onMouseMove: handleTransform,
         onMouseUp: dragEnd,
         onMouseLeave: dragEnd,
     };
-    /* remove transform nodes on switching draw mode */
+
     useEffect(() => {
+        /* remove transform nodes on switching draw mode */
         if (drawMode !== "transform") {
             setTransformNode(<></>);
+            targetIndex.current = -1;
         }
-    }, [drawMode]);
+        /* keyboard shorcuts */
+        const handleEvent = (e: KeyboardEvent) => {
+            handleKeyDown(e, finalSvg, setFinalSvg, targetIndex);
+        };
+        window.addEventListener("keydown", handleEvent);
+        return () => {
+            window.removeEventListener("keydown", handleEvent);
+        };
+    }, [drawMode, setFinalSvg, finalSvg]);
     return { transformEvent, transformNode };
 };
 

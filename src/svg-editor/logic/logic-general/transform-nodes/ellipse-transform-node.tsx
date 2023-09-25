@@ -16,7 +16,7 @@ const EllipseTransformNode = ({ finalSvg, ellipseIndex }: props) => {
     return (
         <>
             <line
-                className="ellipse-transform-node transform-node"
+                className="ellipse-cross"
                 id="cross"
                 x1={finalSvg[ellipseIndex].cx}
                 y1={finalSvg[ellipseIndex].cy! - 5}
@@ -26,7 +26,7 @@ const EllipseTransformNode = ({ finalSvg, ellipseIndex }: props) => {
                 strokeWidth="2"
             />
             <line
-                className="ellipse-transform-node transform-node"
+                className="ellipse-cross"
                 id="cross"
                 x1={finalSvg[ellipseIndex].cx! - 5}
                 y1={finalSvg[ellipseIndex].cy}

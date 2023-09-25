@@ -17,7 +17,7 @@ const RectTransformNode = ({ finalSvg, rectIndex }: props) => {
     return (
         <>
             <line
-                className="rect-transform-node transform-node"
+                className="rect-cross"
                 id="cross"
                 x1={finalSvg[rectIndex].x! + finalSvg[rectIndex].width! / 2}
                 y1={finalSvg[rectIndex].y! + finalSvg[rectIndex].height! / 2 - 5}
@@ -27,7 +27,7 @@ const RectTransformNode = ({ finalSvg, rectIndex }: props) => {
                 strokeWidth="2"
             />
             <line
-                className="rect-transform-node transform-node"
+                className="rect-cross"
                 id="cross"
                 x1={finalSvg[rectIndex].x! + finalSvg[rectIndex].width! / 2 - 5}
                 y1={finalSvg[rectIndex].y! + finalSvg[rectIndex].height! / 2}
