@@ -1,7 +1,7 @@
 import { FinalSvg } from "./types";
 import Canvas from "./ui/canvas";
 import ToolBar from "./ui/tool-bar";
-import useTransform from "./logic/logic-general/use-transform";
+import useTransform from "./logic/logic-transform/use-transform";
 import useRect from "./logic/logic-svg/use-rect";
 import useEllipse from "./logic/logic-svg/use-ellipse";
 import "./editor.css";
