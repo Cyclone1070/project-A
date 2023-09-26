@@ -2,9 +2,10 @@ import { FinalSvg } from "../../types";
 import RectTransformNode from "./transform-nodes/rect-transforn-node";
 import EllipseTransformNode from "./transform-nodes/ellipse-transform-node";
 import { dragStart } from "./drag-start";
-import { handleTransform } from "./handle-transform";
-import { handleKeyDown } from "./keyboardShorcut";
+import handleTransform from "./handle-transform";
+import handleKeyDown from "./keyboardShorcut";
 import { useEffect, useRef, useState } from "react";
+import SelectHighlightNode from "./transform-nodes/highlight-nodes";
 
 const useTransform = (
     finalSvg: FinalSvg,
@@ -16,6 +17,7 @@ const useTransform = (
     const targetIndex = useRef(-1);
     const [start, setStart] = useState<{ x?: number; y?: number; eventType?: string }>({});
     const [transformNode, setTransformNode] = useState(<></>);
+    const [highlightNode, setHighlightNode] = useState(<></>);
 
     function chooseTarget(e: React.MouseEvent) {
         if (
@@ -54,6 +56,7 @@ const useTransform = (
         onMouseDown: (e: React.MouseEvent) => {
             chooseTarget(e);
             dragStart(e, finalSvg, targetIndex.current, isDragging, setStart);
+            setHighlightNode(<></>);
         },
         onMouseMove: (e: React.MouseEvent) => {
             handleTransform(
@@ -66,6 +69,18 @@ const useTransform = (
                 finalSvg,
                 setFinalSvg
             );
+            if (
+                !(e.target as HTMLElement).classList.contains("transform-node") &&
+                !isDragging.current
+            ) {
+                setHighlightNode(
+                    <SelectHighlightNode
+                        e={e}
+                        finalSvg={finalSvg}
+                        targetIndex={targetIndex.current}
+                    />
+                );
+            } else setHighlightNode(<></>);
         },
         onMouseUp: dragEnd,
         onMouseLeave: dragEnd,
@@ -74,9 +89,11 @@ const useTransform = (
     useEffect(() => {
         /* remove transform nodes on switching draw mode */
         if (drawMode !== "transform") {
+            setHighlightNode(<></>);
             setTransformNode(<></>);
             targetIndex.current = -1;
         }
+
         /* keyboard shorcuts */
         const handleEvent = (e: KeyboardEvent) => {
             handleKeyDown(e, finalSvg, setFinalSvg, targetIndex);
@@ -86,7 +103,7 @@ const useTransform = (
             window.removeEventListener("keydown", handleEvent);
         };
     }, [drawMode, setFinalSvg, finalSvg]);
-    return { transformEvent, transformNode };
+    return { transformEvent, transformNode, highlightNode };
 };
 
 export default useTransform;

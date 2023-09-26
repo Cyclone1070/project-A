@@ -12,7 +12,11 @@ const Editor = () => {
     const [finalSvg, setFinalSvg] = useState<FinalSvg>([]);
     const { tempRect, rectEvent } = useRect(setFinalSvg);
     const { tempEllipse, ellipseEvent } = useEllipse(setFinalSvg);
-    const { transformEvent, transformNode } = useTransform(finalSvg, setFinalSvg, drawMode);
+    const { transformEvent, transformNode, highlightNode } = useTransform(
+        finalSvg,
+        setFinalSvg,
+        drawMode
+    );
 
     return (
         <div className="editor">
@@ -32,6 +36,7 @@ const Editor = () => {
                 })}
                 <rect className="temp" {...tempRect} />
                 <ellipse className="temp" {...tempEllipse} />
+                {highlightNode}
                 {transformNode}
             </Canvas>
         </div>

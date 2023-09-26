@@ -1,6 +1,6 @@
 import { FinalSvg } from "../../types";
 
-export const handleKeyDown = (
+const handleKeyDown = (
     e: KeyboardEvent,
     finalSvg: FinalSvg,
     setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>,
@@ -34,3 +34,5 @@ export const handleKeyDown = (
         }
     }
 };
+
+export default handleKeyDown;

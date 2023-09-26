@@ -2,7 +2,7 @@ import { FinalSvg } from "../../types";
 import RectTransformNode from "./transform-nodes/rect-transforn-node";
 import EllipseTransformNode from "./transform-nodes/ellipse-transform-node";
 
-export function handleTransform(
+const handleTransform = (
     e: React.MouseEvent,
     isDragging: boolean,
     targetType: string,
@@ -11,7 +11,7 @@ export function handleTransform(
     start: { x?: number; y?: number; eventType?: string },
     finalSvg: FinalSvg,
     setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>
-) {
+) => {
     if (isDragging) {
         if (targetType === "rect") {
             if (start.eventType === "height") {
@@ -83,4 +83,6 @@ export function handleTransform(
             );
         }
     }
-}
+};
+
+export default handleTransform;
