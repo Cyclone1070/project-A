@@ -8,6 +8,7 @@ export interface Rect {
     fill?: string;
     stroke?: string;
     strokeWidth?: number;
+    transform?: string;
 }
 export interface Ellipse {
     tag?: string;
@@ -19,6 +20,7 @@ export interface Ellipse {
     fill?: string;
     stroke?: string;
     strokeWidth?: number;
+    transform?: string;
 }
 interface SingleFinalSvg extends Rect, Ellipse {
     id?: string;

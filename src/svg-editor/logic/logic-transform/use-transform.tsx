@@ -4,106 +4,196 @@ import EllipseTransformNode from "./transform-nodes/ellipse-transform-node";
 import { dragStart } from "./drag-start";
 import handleTransform from "./handle-transform";
 import handleKeyDown from "./keyboardShorcut";
-import { useEffect, useRef, useState } from "react";
-import SelectHighlightNode from "./transform-nodes/highlight-nodes";
+import { useEffect, useState } from "react";
+import useSelectionBox from "./use-selection-box";
 
 const useTransform = (
     finalSvg: FinalSvg,
     setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>,
-    drawMode: string
+    drawMode: string,
+    canvasRef: React.MutableRefObject<SVGSVGElement>
 ) => {
-    const isDragging = useRef(false);
-    const targetType = useRef("");
-    const targetIndex = useRef(-1);
-    const [start, setStart] = useState<{ x?: number; y?: number; eventType?: string }>({});
+    const [isDragging, setIsDragging] = useState(false);
+    const [targetIndex, setTargetIndex] = useState(-1);
+    const [multiTargetIndex, setMultiTargetIndex] = useState<number[]>([]);
+    const [start, setStart] = useState<{
+        x?: number;
+        y?: number;
+        eventType?: string;
+        rotateX?: number;
+        rotateY?: number;
+    }>({});
     const [transformNode, setTransformNode] = useState(<></>);
-    const [highlightNode, setHighlightNode] = useState(<></>);
+    const [multiTransformNodes, setMultiTransformNode] = useState<FinalSvg>([{}]);
+    const [highlightNode, setHighlightNode] = useState<FinalSvg>([]);
+    const {
+        addSelectionBox,
+        adjustSelectionBox,
+        endSelection,
+        selectionBox,
+        multiDragStart,
+        handleMultiTransform,
+    } = useSelectionBox();
 
     function chooseTarget(e: React.MouseEvent) {
         if (
+            multiTargetIndex.includes(
+                finalSvg.findIndex((svg) => svg.id === (e.target as HTMLElement).id)
+            )
+        ) {
+            return -1;
+        } else if (
             (e.target as HTMLElement).tagName === "rect" &&
             !(e.target as HTMLElement).classList.contains("transform-node")
         ) {
-            targetType.current = "rect";
-            targetIndex.current = finalSvg.findIndex(
+            const rectIndex = finalSvg.findIndex(
                 (rect) => rect.id === (e.target as HTMLElement).id
             );
+            setTargetIndex(rectIndex);
             setTransformNode(
-                <RectTransformNode finalSvg={finalSvg} rectIndex={targetIndex.current} />
+                <RectTransformNode
+                    finalSvg={finalSvg}
+                    rectIndex={rectIndex}
+                    rotate={finalSvg[rectIndex].transform!}
+                />
             );
+            return rectIndex;
         } else if (
             (e.target as HTMLElement).tagName === "ellipse" &&
             !(e.target as HTMLElement).classList.contains("transform-node")
         ) {
-            targetType.current = "ellipse";
-            targetIndex.current = finalSvg.findIndex(
+            const ellipseIndex = finalSvg.findIndex(
                 (ellipse) => ellipse.id === (e.target as HTMLElement).id
             );
+            setTargetIndex(ellipseIndex);
             setTransformNode(
-                <EllipseTransformNode finalSvg={finalSvg} ellipseIndex={targetIndex.current} />
+                <EllipseTransformNode
+                    finalSvg={finalSvg}
+                    ellipseIndex={ellipseIndex}
+                    rotate={finalSvg[ellipseIndex].transform!}
+                />
             );
+            return ellipseIndex;
         } else if ((e.target as HTMLElement).tagName === "svg") {
             setTransformNode(<></>);
-            targetIndex.current = -1;
+            setTargetIndex(-1);
+            return -1;
+        } else {
+            return -1;
         }
-    }
-    function dragEnd() {
-        isDragging.current = false;
-        setStart({});
     }
 
     const transformEvent = {
         onMouseDown: (e: React.MouseEvent) => {
-            chooseTarget(e);
-            dragStart(e, finalSvg, targetIndex.current, isDragging, setStart);
-            setHighlightNode(<></>);
-        },
-        onMouseMove: (e: React.MouseEvent) => {
-            handleTransform(
-                e,
-                isDragging.current,
-                targetType.current,
-                targetIndex.current,
-                setTransformNode,
-                start,
-                finalSvg,
-                setFinalSvg
-            );
+            setIsDragging(true);
+            const tempIndex = chooseTarget(e);
+            dragStart(e, finalSvg, tempIndex, targetIndex, setStart);
+            setHighlightNode([{}]);
+            addSelectionBox(e);
+            multiDragStart(e, finalSvg, multiTargetIndex);
+            /* reset */
             if (
-                !(e.target as HTMLElement).classList.contains("transform-node") &&
-                !isDragging.current
+                !multiTargetIndex.includes(
+                    finalSvg.findIndex((svg) => svg.id === (e.target as HTMLElement).id)
+                )
             ) {
-                setHighlightNode(
-                    <SelectHighlightNode
-                        e={e}
-                        finalSvg={finalSvg}
-                        targetIndex={targetIndex.current}
-                    />
-                );
-            } else setHighlightNode(<></>);
+                setMultiTargetIndex([]);
+                setMultiTransformNode([{}]);
+            }
         },
-        onMouseUp: dragEnd,
-        onMouseLeave: dragEnd,
+
+        onMouseMove: (e: React.MouseEvent) => {
+            if (isDragging) {
+                handleTransform(
+                    e,
+                    targetIndex,
+                    setTransformNode,
+                    start,
+                    finalSvg,
+                    setFinalSvg,
+                    canvasRef
+                );
+                handleMultiTransform(
+                    e,
+                    finalSvg,
+                    setFinalSvg,
+                    setMultiTransformNode,
+                    multiTargetIndex
+                );
+                if (targetIndex === -1 && multiTargetIndex.length === 0) {
+                    adjustSelectionBox(e);
+                }
+            }
+            /* highlight when hover */
+            if (!(e.target as HTMLElement).classList.contains("transform-node") && !isDragging) {
+                setHighlightNode(() => {
+                    const svgIndex = finalSvg.findIndex(
+                        (svg) => svg.id === (e.target as HTMLElement).id
+                    );
+                    if (
+                        svgIndex !== targetIndex &&
+                        svgIndex !== -1 &&
+                        !multiTargetIndex.includes(svgIndex)
+                    ) {
+                        return [
+                            {
+                                ...finalSvg[svgIndex],
+                                className: "transform-node",
+                                fill: "transparent",
+                                stroke: "red",
+                                style: { pointerEvents: "none" },
+                            },
+                        ];
+                    } else {
+                        return [{}];
+                    }
+                });
+            } else setHighlightNode([{}]);
+        },
+
+        onMouseUp: () => {
+            setIsDragging(false);
+            setStart({});
+            endSelection(
+                canvasRef,
+                finalSvg,
+                setMultiTransformNode,
+                setMultiTargetIndex,
+                multiTargetIndex
+            );
+        },
+        onMouseLeave: () => {
+            setIsDragging(false);
+            setStart({});
+            endSelection(
+                canvasRef,
+                finalSvg,
+                setMultiTransformNode,
+                setMultiTargetIndex,
+                multiTargetIndex
+            );
+        },
     };
 
     useEffect(() => {
         /* remove transform nodes on switching draw mode */
         if (drawMode !== "transform") {
-            setHighlightNode(<></>);
+            setHighlightNode([{}]);
             setTransformNode(<></>);
-            targetIndex.current = -1;
+            setMultiTransformNode([{}]);
+            setTargetIndex(-1);
         }
 
         /* keyboard shorcuts */
         const handleEvent = (e: KeyboardEvent) => {
-            handleKeyDown(e, finalSvg, setFinalSvg, targetIndex);
+            handleKeyDown(e, finalSvg, setFinalSvg, targetIndex, setTargetIndex);
         };
         window.addEventListener("keydown", handleEvent);
         return () => {
             window.removeEventListener("keydown", handleEvent);
         };
-    }, [drawMode, setFinalSvg, finalSvg]);
-    return { transformEvent, transformNode, highlightNode };
+    }, [drawMode, setFinalSvg, finalSvg, targetIndex]);
+    return { transformEvent, transformNode, highlightNode, selectionBox, multiTransformNodes };
 };
 
 export default useTransform;

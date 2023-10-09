@@ -1,28 +1,27 @@
 /* logic for setting viewBox */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-const useViewBox = () => {
+const useViewBox = (canvasRef: React.MutableRefObject<SVGSVGElement>) => {
     const [size, setSize] = useState({ width: 0, height: 0 });
-    const sizeRef = useRef<SVGSVGElement>(null);
 
     useEffect(() => {
         changeSize();
         window.addEventListener("resize", changeSize);
 
         function changeSize() {
-            if (sizeRef.current) {
+            if (canvasRef.current) {
                 setSize({
-                    width: sizeRef.current.getBoundingClientRect().width,
-                    height: sizeRef.current.getBoundingClientRect().height,
+                    width: canvasRef.current.getBoundingClientRect().width,
+                    height: canvasRef.current.getBoundingClientRect().height,
                 });
             }
         }
         return () => {
             window.removeEventListener("resize", changeSize);
         };
-    }, []);
-    return { size, sizeRef };
+    }, [canvasRef]);
+    return { size, canvasRef };
 };
 
 export default useViewBox;

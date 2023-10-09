@@ -5,25 +5,24 @@ import useTransform from "./logic/logic-transform/use-transform";
 import useRect from "./logic/logic-svg/use-rect";
 import useEllipse from "./logic/logic-svg/use-ellipse";
 import "./editor.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const Editor = () => {
+    const canvasRef = useRef<SVGSVGElement>(null) as React.MutableRefObject<SVGSVGElement>;
     const [drawMode, setDrawMode] = useState("transform"); /* for choosing draw mode */
     const [finalSvg, setFinalSvg] = useState<FinalSvg>([]);
     const { tempRect, rectEvent } = useRect(setFinalSvg);
     const { tempEllipse, ellipseEvent } = useEllipse(setFinalSvg);
-    const { transformEvent, transformNode, highlightNode } = useTransform(
-        finalSvg,
-        setFinalSvg,
-        drawMode
-    );
+    const { transformEvent, transformNode, highlightNode, selectionBox, multiTransformNodes } =
+        useTransform(finalSvg, setFinalSvg, drawMode, canvasRef);
 
     return (
         <div className="editor">
             <ToolBar setDrawMode={setDrawMode} />
             <Canvas
-                {...(drawMode === "rect" && { drawEvent: rectEvent })}
+                canvasRef={canvasRef}
                 {...(drawMode === "transform" && { drawEvent: transformEvent })}
+                {...(drawMode === "rect" && { drawEvent: rectEvent })}
                 {...(drawMode === "ellipse" && { drawEvent: ellipseEvent })}
             >
                 {finalSvg.map(({ tag, ...currentSvg }) => {
@@ -36,8 +35,24 @@ const Editor = () => {
                 })}
                 <rect className="temp" {...tempRect} />
                 <ellipse className="temp" {...tempEllipse} />
-                {highlightNode}
+                {highlightNode.map(({ tag, ...currentSvg }) => {
+                    if (tag === "rect") {
+                        return <rect key={currentSvg.id} {...currentSvg} />;
+                    }
+                    if (tag === "ellipse") {
+                        return <ellipse key={currentSvg.id} {...currentSvg} />;
+                    }
+                })}
                 {transformNode}
+                {multiTransformNodes.map(({ tag, ...currentSvg }) => {
+                    if (tag === "rect") {
+                        return <rect key={currentSvg.id} {...currentSvg} />;
+                    }
+                    if (tag === "ellipse") {
+                        return <ellipse key={currentSvg.id} {...currentSvg} />;
+                    }
+                })}
+                <rect className="temp" {...selectionBox} />
             </Canvas>
         </div>
     );

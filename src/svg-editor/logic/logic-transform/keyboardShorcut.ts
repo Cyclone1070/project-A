@@ -1,35 +1,58 @@
+/* code extraction from use-transform */
+
 import { FinalSvg } from "../../types";
 
 const handleKeyDown = (
     e: KeyboardEvent,
     finalSvg: FinalSvg,
     setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>,
-    targetIndex: React.MutableRefObject<number>
+    targetIndex: number,
+    setTargetIndex: React.Dispatch<React.SetStateAction<number>>
 ) => {
-    if (targetIndex.current !== -1) {
-        if (e.key === "[") {
-            if (targetIndex.current < finalSvg.length - 1) {
-                targetIndex.current += 1;
+    if (targetIndex !== -1) {
+        if (e.key === "]") {
+            if (targetIndex < finalSvg.length - 1) {
                 setFinalSvg((prevSvgs) => {
                     const holderSvgs = [...prevSvgs];
-                    [holderSvgs[targetIndex.current], holderSvgs[targetIndex.current - 1]] = [
-                        holderSvgs[targetIndex.current - 1],
-                        holderSvgs[targetIndex.current],
+                    [holderSvgs[targetIndex], holderSvgs[targetIndex + 1]] = [
+                        holderSvgs[targetIndex + 1],
+                        holderSvgs[targetIndex],
                     ];
                     return holderSvgs;
                 });
+                setTargetIndex((prev) => prev + 1);
             }
-        } else if (e.key === "]") {
-            if (targetIndex.current > 0) {
-                targetIndex.current -= 1;
+        } else if (e.key === "[") {
+            if (targetIndex > 0) {
                 setFinalSvg((prevSvgs) => {
                     const holderSvgs = [...prevSvgs];
-                    [holderSvgs[targetIndex.current], holderSvgs[targetIndex.current + 1]] = [
-                        holderSvgs[targetIndex.current + 1],
-                        holderSvgs[targetIndex.current],
+                    [holderSvgs[targetIndex], holderSvgs[targetIndex - 1]] = [
+                        holderSvgs[targetIndex - 1],
+                        holderSvgs[targetIndex],
                     ];
                     return holderSvgs;
                 });
+                setTargetIndex((prev) => prev - 1);
+            }
+        } else if (e.key === "}") {
+            if (targetIndex < finalSvg.length - 1) {
+                setFinalSvg((prevSvgs) => {
+                    const holderSvgs = [...prevSvgs];
+                    const targetSvg = holderSvgs.splice(targetIndex, 1);
+                    holderSvgs.push(targetSvg[0]);
+                    return holderSvgs;
+                });
+                setTargetIndex(finalSvg.length - 1);
+            }
+        } else if (e.key === "{") {
+            if (targetIndex > 0) {
+                setFinalSvg((prevSvgs) => {
+                    const holderSvgs = [...prevSvgs];
+                    const targetSvg = holderSvgs.splice(targetIndex, 1);
+                    holderSvgs.unshift(targetSvg[0]);
+                    return holderSvgs;
+                });
+                setTargetIndex(0);
             }
         }
     }

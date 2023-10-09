@@ -1,12 +1,12 @@
 /* logic behind rect */
 import { Rect } from "../../types";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { v4 as uuid } from "uuid";
 
 const useRect = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>) => {
     /* when drag */
     const [tempRect, setTempRect] = useState<Rect>({});
-    const isDragging = useRef(false);
+    const [isDragging, setIsDragging] = useState(false);
     /* variable for adjusting tempRect */
     const [start, setStart] = useState<{ x?: number; y?: number }>({});
 
@@ -22,11 +22,11 @@ const useRect = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>) =>
             stroke: "black",
             strokeWidth: 1.5,
         });
-        isDragging.current = true;
+        setIsDragging(true);
     }
 
     function adjustTempRect(e: React.MouseEvent) {
-        if (isDragging.current) {
+        if (isDragging) {
             setTempRect((prevRect) => {
                 /* avoiding glichy tempRect when event is fired before state update (drag immediately after click) */
                 if (start.x && start.y) {
@@ -45,7 +45,7 @@ const useRect = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>) =>
     }
 
     function finalizeRect() {
-        if (isDragging.current) {
+        if (isDragging) {
             setFinalSvg((prevSvg) => {
                 /* check for final visibility */
                 if (tempRect.width !== 0 && tempRect.height !== 0) {
@@ -57,7 +57,7 @@ const useRect = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>) =>
         }
         /* reset */
         setTempRect({});
-        isDragging.current = false;
+        setIsDragging(false);
         setStart({});
     }
 

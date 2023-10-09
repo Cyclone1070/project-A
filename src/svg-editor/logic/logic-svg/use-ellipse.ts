@@ -1,11 +1,11 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { v4 as uuid } from "uuid";
 import { Ellipse } from "../../types";
 
 const useEllipse = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>) => {
     /* when drag */
     const [tempEllipse, setTempEllipse] = useState<Ellipse>({});
-    const isDragging = useRef(false);
+    const [isDragging, setIsDragging] = useState(false);
     /* variable for adjusting tempEllipse */
     const [start, setStart] = useState<{ x?: number; y?: number }>({});
 
@@ -21,11 +21,11 @@ const useEllipse = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>)
             stroke: "black",
             strokeWidth: 1.5,
         });
-        isDragging.current = true;
+        setIsDragging(true);
     }
 
     function adjustTempEllipse(e: React.MouseEvent) {
-        if (isDragging.current) {
+        if (isDragging) {
             setTempEllipse((prevEllipse) => {
                 /* avoiding glichy tempEllipse when event is fired before state update (drag immediately after click) */
                 if (start.x && start.y) {
@@ -44,7 +44,7 @@ const useEllipse = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>)
     }
 
     function finalizeEllipse() {
-        if (isDragging.current) {
+        if (isDragging) {
             setFinalSvg((prevSvg) => {
                 /* check for final visibility */
                 if (tempEllipse.rx !== 0 && tempEllipse.ry !== 0) {
@@ -56,7 +56,7 @@ const useEllipse = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>)
         }
         /* reset */
         setTempEllipse({});
-        isDragging.current = false;
+        setIsDragging(false);
         setStart({});
     }
 

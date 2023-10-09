@@ -1,136 +1,171 @@
+/* code extraction from use-transform */
+
 import { FinalSvg } from "../../types";
 
 export function dragStart(
     e: React.MouseEvent,
     finalSvg: FinalSvg,
+    tempIndex: number,
     targetIndex: number,
-    isDragging: React.MutableRefObject<boolean>,
     setStart: React.Dispatch<
         React.SetStateAction<{
             x?: number;
             y?: number;
             eventType?: string;
+            rotateX?: number;
+            rotateY?: number;
         }>
     >
 ) {
-    /* set start info */
+    let index = -1;
+    if (tempIndex !== -1) {
+        index = tempIndex;
+    } else {
+        index = targetIndex;
+    }
     if ((e.target as HTMLElement).classList.contains("rect-transform-node")) {
-        isDragging.current = true;
         if ((e.target as HTMLElement).id === "top") {
             setStart({
-                y: finalSvg[targetIndex].y! + finalSvg[targetIndex].height!,
+                y: finalSvg[index].y! + finalSvg[index].height!,
                 eventType: "height",
             });
         } else if ((e.target as HTMLElement).id === "bottom") {
             setStart({
-                y: finalSvg[targetIndex].y,
+                y: finalSvg[index].y,
                 eventType: "height",
             });
         } else if ((e.target as HTMLElement).id === "left") {
             setStart({
-                x: finalSvg[targetIndex].x! + finalSvg[targetIndex].width!,
+                x: finalSvg[index].x! + finalSvg[index].width!,
                 eventType: "width",
             });
         } else if ((e.target as HTMLElement).id === "right") {
             setStart({
-                x: finalSvg[targetIndex].x,
+                x: finalSvg[index].x,
                 eventType: "width",
             });
         } else if ((e.target as HTMLElement).id === "top-left") {
             setStart({
-                x: finalSvg[targetIndex].x! + finalSvg[targetIndex].width!,
-                y: finalSvg[targetIndex].y! + finalSvg[targetIndex].height!,
+                x: finalSvg[index].x! + finalSvg[index].width!,
+                y: finalSvg[index].y! + finalSvg[index].height!,
                 eventType: "corner",
             });
         } else if ((e.target as HTMLElement).id === "top-right") {
             setStart({
-                x: finalSvg[targetIndex].x,
-                y: finalSvg[targetIndex].y! + finalSvg[targetIndex].height!,
+                x: finalSvg[index].x,
+                y: finalSvg[index].y! + finalSvg[index].height!,
                 eventType: "corner",
             });
         } else if ((e.target as HTMLElement).id === "bottom-left") {
             setStart({
-                x: finalSvg[targetIndex].x! + finalSvg[targetIndex].width!,
-                y: finalSvg[targetIndex].y,
+                x: finalSvg[index].x! + finalSvg[index].width!,
+                y: finalSvg[index].y,
                 eventType: "corner",
             });
         } else if ((e.target as HTMLElement).id === "bottom-right") {
             setStart({
-                x: finalSvg[targetIndex].x,
-                y: finalSvg[targetIndex].y,
+                x: finalSvg[index].x,
+                y: finalSvg[index].y,
                 eventType: "corner",
+            });
+        } else if ((e.target as HTMLElement).id === "rotate") {
+            setStart({
+                eventType: "rotate",
             });
         }
     } else if ((e.target as HTMLElement).classList.contains("ellipse-transform-node")) {
-        isDragging.current = true;
         if ((e.target as HTMLElement).id === "top") {
             setStart({
-                y: finalSvg[targetIndex].cy! + finalSvg[targetIndex].ry!,
+                y: finalSvg[index].cy! + finalSvg[index].ry!,
                 eventType: "height",
             });
         } else if ((e.target as HTMLElement).id === "bottom") {
             setStart({
-                y: finalSvg[targetIndex].cy! - finalSvg[targetIndex].ry!,
+                y: finalSvg[index].cy! - finalSvg[index].ry!,
                 eventType: "height",
             });
         } else if ((e.target as HTMLElement).id === "left") {
             setStart({
-                x: finalSvg[targetIndex].cx! + finalSvg[targetIndex].rx!,
+                x: finalSvg[index].cx! + finalSvg[index].rx!,
                 eventType: "width",
             });
         } else if ((e.target as HTMLElement).id === "right") {
             setStart({
-                x: finalSvg[targetIndex].cx! - finalSvg[targetIndex].rx!,
+                x: finalSvg[index].cx! - finalSvg[index].rx!,
                 eventType: "width",
             });
         } else if ((e.target as HTMLElement).id === "top-left") {
             setStart({
-                x: finalSvg[targetIndex].cx! + finalSvg[targetIndex].rx!,
-                y: finalSvg[targetIndex].cy! + finalSvg[targetIndex].ry!,
+                x: finalSvg[index].cx! + finalSvg[index].rx!,
+                y: finalSvg[index].cy! + finalSvg[index].ry!,
                 eventType: "corner",
             });
         } else if ((e.target as HTMLElement).id === "top-right") {
             setStart({
-                x: finalSvg[targetIndex].cx! - finalSvg[targetIndex].rx!,
-                y: finalSvg[targetIndex].cy! + finalSvg[targetIndex].ry!,
+                x: finalSvg[index].cx! - finalSvg[index].rx!,
+                y: finalSvg[index].cy! + finalSvg[index].ry!,
                 eventType: "corner",
             });
         } else if ((e.target as HTMLElement).id === "bottom-left") {
             setStart({
-                x: finalSvg[targetIndex].cx! + finalSvg[targetIndex].rx!,
-                y: finalSvg[targetIndex].cy! - finalSvg[targetIndex].ry!,
+                x: finalSvg[index].cx! + finalSvg[index].rx!,
+                y: finalSvg[index].cy! - finalSvg[index].ry!,
                 eventType: "corner",
             });
         } else if ((e.target as HTMLElement).id === "bottom-right") {
             setStart({
-                x: finalSvg[targetIndex].cx! - finalSvg[targetIndex].rx!,
-                y: finalSvg[targetIndex].cy! - finalSvg[targetIndex].ry!,
+                x: finalSvg[index].cx! - finalSvg[index].rx!,
+                y: finalSvg[index].cy! - finalSvg[index].ry!,
                 eventType: "corner",
+            });
+        } else if ((e.target as HTMLElement).id === "rotate") {
+            setStart({
+                eventType: "rotate",
             });
         }
     } else if (
-        (finalSvg[targetIndex] &&
-            (e.target as HTMLElement).id === finalSvg[targetIndex].id &&
+        (finalSvg[index] &&
+            (e.target as HTMLElement).id === finalSvg[index].id &&
             (e.target as HTMLElement).tagName === "rect") ||
         (e.target as HTMLElement).classList.contains("rect-cross")
     ) {
-        isDragging.current = true;
+        let distanceToRotateCenter = {};
+        if (Object.prototype.hasOwnProperty.call(finalSvg[index], "transform")) {
+            distanceToRotateCenter = {
+                rotateX:
+                    e.nativeEvent.offsetX - +finalSvg[index].transform!.split("(")[1].split(" ")[1],
+                rotateY:
+                    e.nativeEvent.offsetY -
+                    +finalSvg[index].transform!.split("(")[1].split(" ")[2].split(")")[0],
+            };
+        }
         setStart({
-            x: e.nativeEvent.offsetX - finalSvg[targetIndex].x!,
-            y: e.nativeEvent.offsetY - finalSvg[targetIndex].y!,
+            x: e.nativeEvent.offsetX - finalSvg[index].x!,
+            y: e.nativeEvent.offsetY - finalSvg[index].y!,
             eventType: "drag",
+            ...distanceToRotateCenter,
         });
     } else if (
-        (finalSvg[targetIndex] &&
-            (e.target as HTMLElement).id === finalSvg[targetIndex].id &&
+        (finalSvg[index] &&
+            (e.target as HTMLElement).id === finalSvg[index].id &&
             (e.target as HTMLElement).tagName === "ellipse") ||
         (e.target as HTMLElement).classList.contains("ellipse-cross")
     ) {
-        isDragging.current = true;
+        let distanceToRotateCenter = {};
+        if (Object.prototype.hasOwnProperty.call(finalSvg[index], "transform")) {
+            distanceToRotateCenter = {
+                rotateX:
+                    e.nativeEvent.offsetX - +finalSvg[index].transform!.split("(")[1].split(" ")[1],
+                rotateY:
+                    e.nativeEvent.offsetY -
+                    +finalSvg[index].transform!.split("(")[1].split(" ")[2].split(")")[0],
+            };
+        }
         setStart({
-            x: e.nativeEvent.offsetX - finalSvg[targetIndex].cx!,
-            y: e.nativeEvent.offsetY - finalSvg[targetIndex].cy!,
+            x: e.nativeEvent.offsetX - finalSvg[index].cx!,
+            y: e.nativeEvent.offsetY - finalSvg[index].cy!,
             eventType: "drag",
+            ...distanceToRotateCenter,
         });
     }
 }
