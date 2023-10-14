@@ -10,8 +10,7 @@ const handleTransform = (
     setTransformNode: React.Dispatch<React.SetStateAction<JSX.Element>>,
     start: { x?: number; y?: number; eventType?: string; rotateX?: number; rotateY?: number },
     finalSvg: FinalSvg,
-    setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>,
-    canvasRef: React.MutableRefObject<SVGSVGElement>
+    setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>
 ) => {
     let mouseX = e.nativeEvent.offsetX;
     let mouseY = e.nativeEvent.offsetY;
@@ -76,21 +75,16 @@ const handleTransform = (
                 return prevRect;
             });
         } else if (start.eventType === "rotate") {
-            let bBox = null;
-            for (let i = 0; i < canvasRef.current.children.length; i++) {
-                if (finalSvg[targetIndex].id === canvasRef.current.children[i].id) {
-                    bBox = (canvasRef.current.children[i] as SVGGraphicsElement).getBBox();
-                }
-            }
-            const center = { x: bBox!.x + bBox!.width / 2, y: bBox!.y + bBox!.height / 2 };
             const angle = (
-                Math.atan2(e.nativeEvent.offsetY - center.y, e.nativeEvent.offsetX - center.x) *
+                Math.atan2(e.nativeEvent.offsetY - start.y!, e.nativeEvent.offsetX - start.x!) *
                     (180 / Math.PI) +
                 90
             ).toFixed(1);
             setFinalSvg((prevSvgs) => {
                 const newSvgs = [...prevSvgs];
-                newSvgs[targetIndex].transform = `rotate(${angle} ${center.x} ${center.y})`;
+                newSvgs[targetIndex].transform = `rotate(${angle} ${start.x} ${start.y})`;
+                newSvgs[targetIndex].x = start.x! - newSvgs[targetIndex].width! / 2;
+                newSvgs[targetIndex].y = start.y! - newSvgs[targetIndex].height! / 2;
                 /* avoid visual delay, fix this if encounter performance issue */
                 setTransformNode(
                     <RectTransformNode
@@ -158,21 +152,16 @@ const handleTransform = (
                 return prevEllipse;
             });
         } else if (start.eventType === "rotate") {
-            let bBox = null;
-            for (let i = 0; i < canvasRef.current.children.length; i++) {
-                if (finalSvg[targetIndex].id === canvasRef.current.children[i].id) {
-                    bBox = (canvasRef.current.children[i] as SVGGraphicsElement).getBBox();
-                }
-            }
-            const center = { x: bBox!.x + bBox!.width / 2, y: bBox!.y + bBox!.height / 2 };
             const angle = (
-                Math.atan2(e.nativeEvent.offsetY - center.y, e.nativeEvent.offsetX - center.x) *
+                Math.atan2(e.nativeEvent.offsetY - start.y!, e.nativeEvent.offsetX - start.x!) *
                     (180 / Math.PI) +
                 90
             ).toFixed(1);
             setFinalSvg((prevSvgs) => {
                 const newSvgs = [...prevSvgs];
-                newSvgs[targetIndex].transform = `rotate(${angle} ${center.x} ${center.y})`;
+                newSvgs[targetIndex].transform = `rotate(${angle} ${start.x} ${start.y})`;
+                newSvgs[targetIndex].cx = start.x;
+                newSvgs[targetIndex].cy = start.y;
                 /* avoid visual delay, fix this if encounter performance issue */
                 setTransformNode(
                     <EllipseTransformNode

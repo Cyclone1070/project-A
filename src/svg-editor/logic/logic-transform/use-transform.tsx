@@ -14,6 +14,7 @@ const useTransform = (
     canvasRef: React.MutableRefObject<SVGSVGElement>
 ) => {
     const [isDragging, setIsDragging] = useState(false);
+    const [isCtrlDown, setIsCtrlDown] = useState(false);
     const [targetIndex, setTargetIndex] = useState(-1);
     const [multiTargetIndex, setMultiTargetIndex] = useState<number[]>([]);
     const [start, setStart] = useState<{
@@ -24,7 +25,7 @@ const useTransform = (
         rotateY?: number;
     }>({});
     const [transformNode, setTransformNode] = useState(<></>);
-    const [multiTransformNodes, setMultiTransformNode] = useState<FinalSvg>([{}]);
+    const [multiTransformNodes, setMultiTransformNodes] = useState<FinalSvg>([{}]);
     const [highlightNode, setHighlightNode] = useState<FinalSvg>([]);
     const {
         addSelectionBox,
@@ -82,12 +83,61 @@ const useTransform = (
             return -1;
         }
     }
+    function chooseMultiTarget(e: React.MouseEvent) {
+        if (
+            finalSvg.findIndex((svg) => svg.id === (e.target as HTMLElement).id) !== -1 &&
+            !multiTargetIndex.includes(
+                finalSvg.findIndex((svg) => svg.id === (e.target as HTMLElement).id)
+            )
+        ) {
+            const targetIndex = finalSvg.findIndex(
+                (svg) => svg.id === (e.target as HTMLElement).id
+            );
+            endSelection(canvasRef, finalSvg, setMultiTransformNodes, setMultiTargetIndex, [
+                ...multiTargetIndex,
+                targetIndex,
+            ]);
+            setMultiTargetIndex((prev) => {
+                return [...prev, targetIndex];
+            });
+        } else if (
+            finalSvg.findIndex((svg) => svg.id === (e.target as HTMLElement).id) !== -1 &&
+            multiTargetIndex.includes(
+                finalSvg.findIndex((svg) => svg.id === (e.target as HTMLElement).id)
+            )
+        ) {
+            const newIndex = [...multiTargetIndex];
+            newIndex.splice(
+                multiTargetIndex.indexOf(
+                    finalSvg.findIndex((svg) => svg.id === (e.target as HTMLElement).id)
+                ),
+                1
+            );
+            endSelection(
+                canvasRef,
+                finalSvg,
+                setMultiTransformNodes,
+                setMultiTargetIndex,
+                newIndex
+            );
+            setMultiTargetIndex(newIndex);
+        }
+    }
 
     const transformEvent = {
         onMouseDown: (e: React.MouseEvent) => {
+            /* multi select when holding ctrl */
+            if (e.ctrlKey || e.metaKey) {
+                setIsCtrlDown(true);
+                chooseMultiTarget(e);
+                setTransformNode(<></>);
+                setHighlightNode([{}]);
+                setTargetIndex(-1);
+                return;
+            }
             setIsDragging(true);
             const tempIndex = chooseTarget(e);
-            dragStart(e, finalSvg, tempIndex, targetIndex, setStart);
+            dragStart(e, finalSvg, tempIndex, targetIndex, setStart, canvasRef);
             setHighlightNode([{}]);
             addSelectionBox(e);
             multiDragStart(e, finalSvg, multiTargetIndex);
@@ -98,26 +148,21 @@ const useTransform = (
                 )
             ) {
                 setMultiTargetIndex([]);
-                setMultiTransformNode([{}]);
+                setMultiTransformNodes([{}]);
             }
         },
 
         onMouseMove: (e: React.MouseEvent) => {
+            if (isCtrlDown) {
+                return;
+            }
             if (isDragging) {
-                handleTransform(
-                    e,
-                    targetIndex,
-                    setTransformNode,
-                    start,
-                    finalSvg,
-                    setFinalSvg,
-                    canvasRef
-                );
+                handleTransform(e, targetIndex, setTransformNode, start, finalSvg, setFinalSvg);
                 handleMultiTransform(
                     e,
                     finalSvg,
                     setFinalSvg,
-                    setMultiTransformNode,
+                    setMultiTransformNodes,
                     multiTargetIndex
                 );
                 if (targetIndex === -1 && multiTargetIndex.length === 0) {
@@ -152,23 +197,31 @@ const useTransform = (
         },
 
         onMouseUp: () => {
+            if (isCtrlDown) {
+                setIsCtrlDown(false);
+                return;
+            }
             setIsDragging(false);
             setStart({});
             endSelection(
                 canvasRef,
                 finalSvg,
-                setMultiTransformNode,
+                setMultiTransformNodes,
                 setMultiTargetIndex,
                 multiTargetIndex
             );
         },
         onMouseLeave: () => {
+            if (isCtrlDown) {
+                setIsCtrlDown(false);
+                return;
+            }
             setIsDragging(false);
             setStart({});
             endSelection(
                 canvasRef,
                 finalSvg,
-                setMultiTransformNode,
+                setMultiTransformNodes,
                 setMultiTargetIndex,
                 multiTargetIndex
             );
@@ -176,12 +229,13 @@ const useTransform = (
     };
 
     useEffect(() => {
-        /* remove transform nodes on switching draw mode */
+        /* reset transform on switching draw mode */
         if (drawMode !== "transform") {
             setHighlightNode([{}]);
             setTransformNode(<></>);
-            setMultiTransformNode([{}]);
+            setMultiTransformNodes([{}]);
             setTargetIndex(-1);
+            setMultiTargetIndex([]);
         }
 
         /* keyboard shorcuts */

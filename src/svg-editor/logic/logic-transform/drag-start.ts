@@ -1,6 +1,7 @@
 /* code extraction from use-transform */
 
 import { FinalSvg } from "../../types";
+import { rect, ellipse } from "svg-boundings";
 
 export function dragStart(
     e: React.MouseEvent,
@@ -15,7 +16,8 @@ export function dragStart(
             rotateX?: number;
             rotateY?: number;
         }>
-    >
+    >,
+    canvasRef: React.MutableRefObject<SVGSVGElement>
 ) {
     let index = -1;
     if (tempIndex !== -1) {
@@ -69,8 +71,18 @@ export function dragStart(
                 eventType: "corner",
             });
         } else if ((e.target as HTMLElement).id === "rotate") {
-            setStart({
-                eventType: "rotate",
+            setStart(() => {
+                let bBox = null;
+                for (let i = 0; i < canvasRef.current.children.length; i++) {
+                    if (finalSvg[targetIndex].id === canvasRef.current.children[i].id) {
+                        bBox = rect(canvasRef.current.children[i]);
+                    }
+                }
+                return {
+                    eventType: "rotate",
+                    x: bBox!.left + bBox!.width / 2,
+                    y: bBox!.top + bBox!.height / 2,
+                };
             });
         }
     } else if ((e.target as HTMLElement).classList.contains("ellipse-transform-node")) {
@@ -119,8 +131,18 @@ export function dragStart(
                 eventType: "corner",
             });
         } else if ((e.target as HTMLElement).id === "rotate") {
-            setStart({
-                eventType: "rotate",
+            setStart(() => {
+                let bBox = null;
+                for (let i = 0; i < canvasRef.current.children.length; i++) {
+                    if (finalSvg[targetIndex].id === canvasRef.current.children[i].id) {
+                        bBox = ellipse(canvasRef.current.children[i], true);
+                    }
+                }
+                return {
+                    eventType: "rotate",
+                    x: bBox!.left + bBox!.width / 2,
+                    y: bBox!.top + bBox!.height / 2,
+                };
             });
         }
     } else if (
