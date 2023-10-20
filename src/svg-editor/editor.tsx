@@ -13,8 +13,12 @@ const Editor = () => {
     const [finalSvg, setFinalSvg] = useState<FinalSvg>([]);
     const { tempRect, rectEvent } = useRect(setFinalSvg);
     const { tempEllipse, ellipseEvent } = useEllipse(setFinalSvg);
-    const { transformEvent, transformNode, highlightNode, selectionBox, multiTransformNodes } =
-        useTransform(finalSvg, setFinalSvg, drawMode, canvasRef);
+    const { transformEvent, transformNode, highlightNode, selectionBox } = useTransform(
+        finalSvg,
+        setFinalSvg,
+        drawMode,
+        canvasRef
+    );
 
     return (
         <div className="editor">
@@ -44,14 +48,6 @@ const Editor = () => {
                     }
                 })}
                 {transformNode}
-                {multiTransformNodes.map(({ tag, ...currentSvg }) => {
-                    if (tag === "rect") {
-                        return <rect key={currentSvg.id} {...currentSvg} />;
-                    }
-                    if (tag === "ellipse") {
-                        return <ellipse key={currentSvg.id} {...currentSvg} />;
-                    }
-                })}
                 <rect className="temp" {...selectionBox} />
             </Canvas>
         </div>

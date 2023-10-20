@@ -41,8 +41,9 @@ const useSelectionBox = () => {
     }
     function endSelection(
         canvasRef: React.MutableRefObject<SVGSVGElement>,
+        setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>,
         finalSvg: FinalSvg,
-        setMultiTransformNodes: React.Dispatch<React.SetStateAction<FinalSvg>>,
+        setMultiTransformInfo: React.Dispatch<React.SetStateAction<FinalSvg>>,
         setMultiTargetIndex: React.Dispatch<React.SetStateAction<number[]>>,
         multiTargetIndex: number[]
     ) {
@@ -74,25 +75,27 @@ const useSelectionBox = () => {
                 }
             }
         }
-        setMultiTransformNodes(() => {
-            let index = [];
+        setFinalSvg((prev) => {
+            let index: number[] = [];
             if (tempMultiTargetIndex.length !== 0) {
                 index = tempMultiTargetIndex;
             } else {
                 index = multiTargetIndex;
             }
-            const indexedSvg: object[] = [];
-            index.forEach((i) => {
-                indexedSvg.push(finalSvg[i]);
+            const tempMultiTransformInfo: object[] = [];
+            const newNode = prev.map((svg, currentIndex) => {
+                if (index.includes(currentIndex)) {
+                    tempMultiTransformInfo.push({ stroke: svg.stroke, index: currentIndex });
+                    return {
+                        ...svg,
+                        stroke: "blue",
+                    };
+                } else return svg;
             });
-            const newNode = indexedSvg.map((svg) => ({
-                ...svg,
-                className: "transform-node",
-                fill: "transparent",
-                stroke: "blue",
-                strokeDasharray: "8 3",
-                style: { pointerEvents: "none" },
-            }));
+            setMultiTransformInfo((prev) => {
+                console.log(prev);
+                return [...prev, ...tempMultiTransformInfo];
+            });
             return newNode;
         });
         setSelectionBox({});
@@ -213,18 +216,16 @@ const useSelectionBox = () => {
                 });
             }
             setMultiTransformNodes(() => {
-                const indexedSvg = [{}];
-                multiTargetIndex.forEach((i) => {
-                    indexedSvg.push(finalSvg[i]);
+                const newNode = finalSvg.map((svg, currentIndex) => {
+                    if (multiTargetIndex.includes(currentIndex)) {
+                        return {
+                            ...svg,
+                            className: "transform-node",
+                            stroke: "blue",
+                            style: { pointerEvents: "none" },
+                        };
+                    } else return svg;
                 });
-                const newNode = indexedSvg.map((svg) => ({
-                    ...svg,
-                    className: "transform-node",
-                    fill: "transparent",
-                    stroke: "blue",
-                    strokeDasharray: "8 3",
-                    style: { pointerEvents: "none" },
-                }));
                 return newNode;
             });
         }

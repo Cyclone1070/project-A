@@ -25,5 +25,6 @@ export interface Ellipse {
 interface SingleFinalSvg extends Rect, Ellipse {
     id?: string;
     highlight?: string;
+    index?: number;
 }
 export interface FinalSvg extends Array<SingleFinalSvg> {}

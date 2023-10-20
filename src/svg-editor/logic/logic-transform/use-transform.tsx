@@ -4,7 +4,7 @@ import EllipseTransformNode from "./transform-nodes/ellipse-transform-node";
 import { dragStart } from "./drag-start";
 import handleTransform from "./handle-transform";
 import handleKeyDown from "./keyboardShorcut";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import useSelectionBox from "./use-selection-box";
 
 const useTransform = (
@@ -25,7 +25,7 @@ const useTransform = (
         rotateY?: number;
     }>({});
     const [transformNode, setTransformNode] = useState(<></>);
-    const [multiTransformNodes, setMultiTransformNodes] = useState<FinalSvg>([{}]);
+    const [multiTransformInfo, setMultiTransformInfo] = useState<FinalSvg>([]);
     const [highlightNode, setHighlightNode] = useState<FinalSvg>([]);
     const {
         addSelectionBox,
@@ -93,10 +93,14 @@ const useTransform = (
             const targetIndex = finalSvg.findIndex(
                 (svg) => svg.id === (e.target as HTMLElement).id
             );
-            endSelection(canvasRef, finalSvg, setMultiTransformNodes, setMultiTargetIndex, [
-                ...multiTargetIndex,
-                targetIndex,
-            ]);
+            endSelection(
+                canvasRef,
+                setFinalSvg,
+                finalSvg,
+                setMultiTransformInfo,
+                setMultiTargetIndex,
+                [...multiTargetIndex, targetIndex]
+            );
             setMultiTargetIndex((prev) => {
                 return [...prev, targetIndex];
             });
@@ -115,8 +119,9 @@ const useTransform = (
             );
             endSelection(
                 canvasRef,
+                setFinalSvg,
                 finalSvg,
-                setMultiTransformNodes,
+                setMultiTransformInfo,
                 setMultiTargetIndex,
                 newIndex
             );
@@ -148,7 +153,7 @@ const useTransform = (
                 )
             ) {
                 setMultiTargetIndex([]);
-                setMultiTransformNodes([{}]);
+                resetMultiTransform();
             }
         },
 
@@ -162,7 +167,7 @@ const useTransform = (
                     e,
                     finalSvg,
                     setFinalSvg,
-                    setMultiTransformNodes,
+                    setMultiTransformInfo,
                     multiTargetIndex
                 );
                 if (targetIndex === -1 && multiTargetIndex.length === 0) {
@@ -205,8 +210,9 @@ const useTransform = (
             setStart({});
             endSelection(
                 canvasRef,
+                setFinalSvg,
                 finalSvg,
-                setMultiTransformNodes,
+                setMultiTransformInfo,
                 setMultiTargetIndex,
                 multiTargetIndex
             );
@@ -220,24 +226,40 @@ const useTransform = (
             setStart({});
             endSelection(
                 canvasRef,
+                setFinalSvg,
                 finalSvg,
-                setMultiTransformNodes,
+                setMultiTransformInfo,
                 setMultiTargetIndex,
                 multiTargetIndex
             );
         },
     };
 
+    const resetMultiTransform = useCallback(() => {
+        if (multiTransformInfo.length === 0) {
+            return;
+        }
+        setFinalSvg((prev) => {
+            const newFinalSvg = [...prev];
+            multiTransformInfo.forEach(({ index, ...info }) => {
+                newFinalSvg[index!] = { ...newFinalSvg[index!], ...info };
+            });
+            setMultiTransformInfo([]);
+            return newFinalSvg;
+        });
+    }, [multiTransformInfo, setFinalSvg]);
+
     useEffect(() => {
         /* reset transform on switching draw mode */
         if (drawMode !== "transform") {
             setHighlightNode([{}]);
             setTransformNode(<></>);
-            setMultiTransformNodes([{}]);
+            resetMultiTransform();
             setTargetIndex(-1);
             setMultiTargetIndex([]);
         }
-
+    }, [drawMode, multiTransformInfo, resetMultiTransform, setFinalSvg]);
+    useEffect(() => {
         /* keyboard shorcuts */
         const handleEvent = (e: KeyboardEvent) => {
             handleKeyDown(e, finalSvg, setFinalSvg, targetIndex, setTargetIndex);
@@ -246,8 +268,8 @@ const useTransform = (
         return () => {
             window.removeEventListener("keydown", handleEvent);
         };
-    }, [drawMode, setFinalSvg, finalSvg, targetIndex]);
-    return { transformEvent, transformNode, highlightNode, selectionBox, multiTransformNodes };
+    }, [setFinalSvg, finalSvg, targetIndex]);
+    return { transformEvent, transformNode, highlightNode, selectionBox, multiTransformInfo };
 };
 
 export default useTransform;
