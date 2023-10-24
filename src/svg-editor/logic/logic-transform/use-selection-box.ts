@@ -44,6 +44,7 @@ const useSelectionBox = () => {
         setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>,
         finalSvg: FinalSvg,
         setMultiTransformInfo: React.Dispatch<React.SetStateAction<FinalSvg>>,
+        multiTransformInfo: FinalSvg,
         setMultiTargetIndex: React.Dispatch<React.SetStateAction<number[]>>,
         multiTargetIndex: number[]
     ) {
@@ -82,20 +83,30 @@ const useSelectionBox = () => {
             } else {
                 index = multiTargetIndex;
             }
-            const tempMultiTransformInfo: object[] = [];
+            const newMultiTransformInfo: object[] = [];
             const newNode = prev.map((svg, currentIndex) => {
                 if (index.includes(currentIndex)) {
-                    tempMultiTransformInfo.push({ stroke: svg.stroke, index: currentIndex });
-                    return {
-                        ...svg,
-                        stroke: "blue",
-                    };
+                    if (
+                        !multiTransformInfo.some((info) => {
+                            return info.index === currentIndex;
+                        })
+                    ) {
+                        newMultiTransformInfo.push({ stroke: svg.stroke, index: currentIndex });
+                        return {
+                            ...svg,
+                            stroke: "blue",
+                        };
+                    } else {
+                        newMultiTransformInfo.push(
+                            multiTransformInfo[
+                                multiTransformInfo.findIndex((info) => info.index === currentIndex)
+                            ]
+                        );
+                        return svg;
+                    }
                 } else return svg;
             });
-            setMultiTransformInfo((prev) => {
-                console.log(prev);
-                return [...prev, ...tempMultiTransformInfo];
-            });
+            setMultiTransformInfo(() => [...newMultiTransformInfo]);
             return newNode;
         });
         setSelectionBox({});
@@ -182,7 +193,6 @@ const useSelectionBox = () => {
         e: React.MouseEvent,
         finalSvg: FinalSvg,
         setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>,
-        setMultiTransformNodes: React.Dispatch<React.SetStateAction<FinalSvg>>,
         multiTargetIndex: number[]
     ) {
         for (let i = 0; i < multiTargetIndex.length; i++) {
@@ -215,19 +225,6 @@ const useSelectionBox = () => {
                     return prevEllipse;
                 });
             }
-            setMultiTransformNodes(() => {
-                const newNode = finalSvg.map((svg, currentIndex) => {
-                    if (multiTargetIndex.includes(currentIndex)) {
-                        return {
-                            ...svg,
-                            className: "transform-node",
-                            stroke: "blue",
-                            style: { pointerEvents: "none" },
-                        };
-                    } else return svg;
-                });
-                return newNode;
-            });
         }
     }
 

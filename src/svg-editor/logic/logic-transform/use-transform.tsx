@@ -98,6 +98,7 @@ const useTransform = (
                 setFinalSvg,
                 finalSvg,
                 setMultiTransformInfo,
+                multiTransformInfo,
                 setMultiTargetIndex,
                 [...multiTargetIndex, targetIndex]
             );
@@ -122,10 +123,22 @@ const useTransform = (
                 setFinalSvg,
                 finalSvg,
                 setMultiTransformInfo,
+                multiTransformInfo,
                 setMultiTargetIndex,
                 newIndex
             );
             setMultiTargetIndex(newIndex);
+            setFinalSvg((prev) => {
+                const newSvg = [...prev];
+                const targetIndex = finalSvg.findIndex(
+                    (svg) => svg.id === (e.target as HTMLElement).id
+                );
+                const infoIndex = multiTransformInfo.findIndex(
+                    (info) => info.index === targetIndex
+                );
+                newSvg[targetIndex] = { ...newSvg[targetIndex], ...multiTransformInfo[infoIndex] };
+                return newSvg;
+            });
         }
     }
 
@@ -163,13 +176,7 @@ const useTransform = (
             }
             if (isDragging) {
                 handleTransform(e, targetIndex, setTransformNode, start, finalSvg, setFinalSvg);
-                handleMultiTransform(
-                    e,
-                    finalSvg,
-                    setFinalSvg,
-                    setMultiTransformInfo,
-                    multiTargetIndex
-                );
+                handleMultiTransform(e, finalSvg, setFinalSvg, multiTargetIndex);
                 if (targetIndex === -1 && multiTargetIndex.length === 0) {
                     adjustSelectionBox(e);
                 }
@@ -213,6 +220,7 @@ const useTransform = (
                 setFinalSvg,
                 finalSvg,
                 setMultiTransformInfo,
+                multiTransformInfo,
                 setMultiTargetIndex,
                 multiTargetIndex
             );
@@ -229,6 +237,7 @@ const useTransform = (
                 setFinalSvg,
                 finalSvg,
                 setMultiTransformInfo,
+                multiTransformInfo,
                 setMultiTargetIndex,
                 multiTargetIndex
             );
