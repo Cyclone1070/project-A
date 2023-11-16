@@ -69,7 +69,7 @@ const handleTransform = (
                     <RectTransformNode
                         finalSvg={finalSvg}
                         rectIndex={targetIndex}
-                        rotate={finalSvg[targetIndex].transform!}
+                        transform={finalSvg[targetIndex].transform!}
                     />
                 );
                 return prevRect;
@@ -90,7 +90,7 @@ const handleTransform = (
                     <RectTransformNode
                         finalSvg={finalSvg}
                         rectIndex={targetIndex}
-                        rotate={finalSvg[targetIndex].transform!}
+                        transform={finalSvg[targetIndex].transform!}
                     />
                 );
                 return newSvgs;
@@ -101,7 +101,7 @@ const handleTransform = (
                 <RectTransformNode
                     finalSvg={finalSvg}
                     rectIndex={targetIndex}
-                    rotate={finalSvg[targetIndex].transform!}
+                    transform={finalSvg[targetIndex].transform!}
                 />
             );
         }
@@ -146,7 +146,7 @@ const handleTransform = (
                     <EllipseTransformNode
                         finalSvg={finalSvg}
                         ellipseIndex={targetIndex}
-                        rotate={finalSvg[targetIndex].transform!}
+                        transform={finalSvg[targetIndex].transform!}
                     />
                 );
                 return prevEllipse;
@@ -167,7 +167,7 @@ const handleTransform = (
                     <EllipseTransformNode
                         finalSvg={finalSvg}
                         ellipseIndex={targetIndex}
-                        rotate={finalSvg[targetIndex].transform!}
+                        transform={finalSvg[targetIndex].transform!}
                     />
                 );
                 return newSvgs;
@@ -178,7 +178,7 @@ const handleTransform = (
                 <EllipseTransformNode
                     finalSvg={finalSvg}
                     ellipseIndex={targetIndex}
-                    rotate={finalSvg[targetIndex].transform!}
+                    transform={finalSvg[targetIndex].transform!}
                 />
             );
         }

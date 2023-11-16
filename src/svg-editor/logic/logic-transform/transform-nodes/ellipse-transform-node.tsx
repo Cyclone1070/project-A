@@ -3,10 +3,10 @@ import { Ellipse } from "../../../types";
 interface props {
     finalSvg: Ellipse[];
     ellipseIndex: number;
-    rotate: string;
+    transform: string;
 }
 
-const EllipseTransformNode = ({ finalSvg, ellipseIndex, rotate }: props) => {
+const EllipseTransformNode = ({ finalSvg, ellipseIndex, transform }: props) => {
     const template = {
         width: 13,
         height: 13,
@@ -16,7 +16,7 @@ const EllipseTransformNode = ({ finalSvg, ellipseIndex, rotate }: props) => {
     };
     return (
         <>
-            <g className="transform-node" transform={rotate}>
+            <g className="transform-node" transform={transform}>
                 <line
                     className="ellipse-transform-node transform-node"
                     x1={finalSvg[ellipseIndex].cx!}

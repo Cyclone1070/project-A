@@ -1,9 +1,43 @@
 .editor {
     display: grid;
-    grid-template: 1fr / 50px 1fr 50px;
+    grid-template: 1fr / 40px 1fr 40px;
     height: 100vh;
 }
 .tool-bar {
     display: flex;
     flex-direction: column;
+    background-color: #383838;
+    border-right: 1px solid #bbbbbb;
+    box-shadow: 1px 0 15px rgba(0, 0, 0, 0.9);
+}
+.mode-button {
+    background-color: #383838;
+    color: #ffffffcc;
+    border: 1px solid #bbbbbb;
+    border-bottom: none;
+    border-right: none;
+    height: 40px;
+}
+.mode-button:last-child {
+    border-bottom: 1px solid #bbbbbb;
+}
+.top-bar {
+    grid-column: 1 / 4;
+    height: 25px;
+    padding: 5px;
+    background-color: #383838;
+    color: #ffffffcc;
+    box-shadow: 1px 0 15px rgba(0, 0, 0, 0.9);
+    border-bottom: 1px solid #bbbbbb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.input-group {
+    display: flex;
+    gap: 10px;
+}
+.top-bar-input {
+    width: 60px;
+    background-color: #cbcbcb;
 }

@@ -3,10 +3,10 @@ import { Rect } from "../../../types";
 interface props {
     finalSvg: Rect[];
     rectIndex: number;
-    rotate: string;
+    transform: string;
 }
 
-const RectTransformNode = ({ finalSvg, rectIndex, rotate }: props) => {
+const RectTransformNode = ({ finalSvg, rectIndex, transform }: props) => {
     const template = {
         width: 13,
         height: 13,
@@ -17,7 +17,7 @@ const RectTransformNode = ({ finalSvg, rectIndex, rotate }: props) => {
 
     return (
         <>
-            <g className="transform-node" transform={rotate}>
+            <g className="transform-node" transform={transform}>
                 <line
                     className="rect-transform-node transform-node"
                     x1={finalSvg[rectIndex].x! + finalSvg[rectIndex].width! / 2}

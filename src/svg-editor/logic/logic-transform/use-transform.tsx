@@ -1,4 +1,5 @@
 import { FinalSvg } from "../../types";
+import { rect, ellipse } from "svg-boundings";
 import RectTransformNode from "./transform-nodes/rect-transforn-node";
 import EllipseTransformNode from "./transform-nodes/ellipse-transform-node";
 import { dragStart } from "./drag-start";
@@ -55,7 +56,7 @@ const useTransform = (
                 <RectTransformNode
                     finalSvg={finalSvg}
                     rectIndex={rectIndex}
-                    rotate={finalSvg[rectIndex].transform!}
+                    transform={finalSvg[rectIndex].transform!}
                 />
             );
             return rectIndex;
@@ -71,7 +72,7 @@ const useTransform = (
                 <EllipseTransformNode
                     finalSvg={finalSvg}
                     ellipseIndex={ellipseIndex}
-                    rotate={finalSvg[ellipseIndex].transform!}
+                    transform={finalSvg[ellipseIndex].transform!}
                 />
             );
             return ellipseIndex;
@@ -213,6 +214,30 @@ const useTransform = (
                 setIsCtrlDown(false);
                 return;
             }
+            //reset transform center to the center of the shape
+            if (targetIndex !== -1 && finalSvg[targetIndex].transform) {
+                setFinalSvg((newSvg) => {
+                    if (newSvg[targetIndex].tag === "rect") {
+                        const bbox = rect(canvasRef.current.children[targetIndex]);
+                        newSvg[targetIndex].x =
+                            bbox.left + bbox.width / 2 - newSvg[targetIndex].width! / 2;
+                        newSvg[targetIndex].y =
+                            bbox.top + bbox.height / 2 - newSvg[targetIndex].height! / 2;
+                        newSvg[targetIndex].transform = `rotate(${
+                            newSvg[targetIndex].transform!.split("(")[1].split(" ")[0]
+                        } ${bbox.left + bbox.width / 2} ${bbox.top + bbox.height / 2})`;
+                        return newSvg;
+                    } else if (newSvg[targetIndex].tag === "ellipse") {
+                        const bbox = ellipse(canvasRef.current.children[targetIndex]);
+                        newSvg[targetIndex].cx = bbox.left + bbox.width / 2;
+                        newSvg[targetIndex].cy = bbox.top + bbox.height / 2;
+                        newSvg[targetIndex].transform = `rotate(${
+                            newSvg[targetIndex].transform!.split("(")[1].split(" ")[0]
+                        } ${bbox.left + bbox.width / 2} ${bbox.top + bbox.height / 2})`;
+                        return newSvg;
+                    } else return newSvg;
+                });
+            }
             setIsDragging(false);
             setStart({});
             endSelection(
@@ -278,7 +303,15 @@ const useTransform = (
             window.removeEventListener("keydown", handleEvent);
         };
     }, [setFinalSvg, finalSvg, targetIndex]);
-    return { transformEvent, transformNode, highlightNode, selectionBox, multiTransformInfo };
+    return {
+        transformEvent,
+        transformNode,
+        setTransformNode,
+        highlightNode,
+        selectionBox,
+        multiTransformInfo,
+        targetIndex,
+    };
 };
 
 export default useTransform;

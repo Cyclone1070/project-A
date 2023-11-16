@@ -22,7 +22,7 @@ export interface Ellipse {
     strokeWidth?: number;
     transform?: string;
 }
-interface SingleFinalSvg extends Rect, Ellipse {
+export interface SingleFinalSvg extends Rect, Ellipse {
     id?: string;
     highlight?: string;
     index?: number;

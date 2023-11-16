@@ -1,6 +1,7 @@
 import { FinalSvg } from "./types";
+import TopBar from "./ui/top-bar";
 import Canvas from "./ui/canvas";
-import ToolBar from "./ui/tool-bar";
+import ModeBar from "./ui/mode-bar";
 import useTransform from "./logic/logic-transform/use-transform";
 import useRect from "./logic/logic-svg/use-rect";
 import useEllipse from "./logic/logic-svg/use-ellipse";
@@ -9,20 +10,29 @@ import { useRef, useState } from "react";
 
 const Editor = () => {
     const canvasRef = useRef<SVGSVGElement>(null) as React.MutableRefObject<SVGSVGElement>;
-    const [drawMode, setDrawMode] = useState("transform"); /* for choosing draw mode */
+    const [drawMode, setDrawMode] = useState("transform");
     const [finalSvg, setFinalSvg] = useState<FinalSvg>([]);
     const { tempRect, rectEvent } = useRect(setFinalSvg);
     const { tempEllipse, ellipseEvent } = useEllipse(setFinalSvg);
-    const { transformEvent, transformNode, highlightNode, selectionBox } = useTransform(
-        finalSvg,
-        setFinalSvg,
-        drawMode,
-        canvasRef
-    );
+    const {
+        transformEvent,
+        transformNode,
+        setTransformNode,
+        highlightNode,
+        selectionBox,
+        targetIndex,
+    } = useTransform(finalSvg, setFinalSvg, drawMode, canvasRef);
 
     return (
         <div className="editor">
-            <ToolBar setDrawMode={setDrawMode} />
+            <TopBar
+                targetIndex={targetIndex}
+                finalSvg={finalSvg}
+                setFinalSvg={setFinalSvg}
+                setTransformNode={setTransformNode}
+                canvasRef={canvasRef}
+            />
+            <ModeBar setDrawMode={setDrawMode} drawMode={drawMode} />
             <Canvas
                 canvasRef={canvasRef}
                 {...(drawMode === "transform" && { drawEvent: transformEvent })}
