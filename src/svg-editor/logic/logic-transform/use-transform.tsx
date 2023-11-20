@@ -216,7 +216,8 @@ const useTransform = (
             }
             //reset transform center to the center of the shape
             if (targetIndex !== -1 && finalSvg[targetIndex].transform) {
-                setFinalSvg((newSvg) => {
+                setFinalSvg((prev) => {
+                    const newSvg = [...prev];
                     if (newSvg[targetIndex].tag === "rect") {
                         const bbox = rect(canvasRef.current.children[targetIndex]);
                         newSvg[targetIndex].x =
@@ -284,6 +285,14 @@ const useTransform = (
     }, [multiTransformInfo, setFinalSvg]);
 
     useEffect(() => {
+        if (targetIndex === -1) {
+            setTransformNode(<></>);
+        }
+        if (multiTargetIndex.length === 0) {
+            resetMultiTransform();
+        }
+    }, [multiTargetIndex, resetMultiTransform, targetIndex]);
+    useEffect(() => {
         /* reset transform on switching draw mode */
         if (drawMode !== "transform") {
             setHighlightNode([{}]);
@@ -296,13 +305,22 @@ const useTransform = (
     useEffect(() => {
         /* keyboard shorcuts */
         const handleEvent = (e: KeyboardEvent) => {
-            handleKeyDown(e, finalSvg, setFinalSvg, targetIndex, setTargetIndex);
+            handleKeyDown(
+                e,
+                finalSvg,
+                setFinalSvg,
+                targetIndex,
+                setTargetIndex,
+                multiTargetIndex,
+                setMultiTargetIndex,
+                setMultiTransformInfo
+            );
         };
         window.addEventListener("keydown", handleEvent);
         return () => {
             window.removeEventListener("keydown", handleEvent);
         };
-    }, [setFinalSvg, finalSvg, targetIndex]);
+    }, [setFinalSvg, finalSvg, targetIndex, multiTargetIndex]);
     return {
         transformEvent,
         transformNode,
