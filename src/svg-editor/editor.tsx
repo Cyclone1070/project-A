@@ -5,6 +5,7 @@ import ModeBar from "./ui/mode-bar";
 import useTransform from "./logic/logic-transform/use-transform";
 import useRect from "./logic/logic-svg/use-rect";
 import useEllipse from "./logic/logic-svg/use-ellipse";
+import usePath from "./logic/logic-svg/use-path";
 import "./editor.css";
 import { useRef, useState } from "react";
 
@@ -14,6 +15,7 @@ const Editor = () => {
     const [finalSvg, setFinalSvg] = useState<FinalSvg>([]);
     const { tempRect, rectEvent } = useRect(setFinalSvg);
     const { tempEllipse, ellipseEvent } = useEllipse(setFinalSvg);
+    const { tempPath, pathEvent } = usePath(setFinalSvg);
     const {
         transformEvent,
         transformNode,
@@ -38,6 +40,7 @@ const Editor = () => {
                 {...(drawMode === "transform" && { drawEvent: transformEvent })}
                 {...(drawMode === "rect" && { drawEvent: rectEvent })}
                 {...(drawMode === "ellipse" && { drawEvent: ellipseEvent })}
+                {...(drawMode === "path" && { drawEvent: pathEvent })}
             >
                 {finalSvg.map(({ tag, ...currentSvg }) => {
                     if (tag === "rect") {
@@ -49,6 +52,7 @@ const Editor = () => {
                 })}
                 <rect className="temp" {...tempRect} />
                 <ellipse className="temp" {...tempEllipse} />
+                <path className="temp" {...tempPath} />
                 {highlightNode.map(({ tag, ...currentSvg }) => {
                     if (tag === "rect") {
                         return <rect key={currentSvg.id} {...currentSvg} />;

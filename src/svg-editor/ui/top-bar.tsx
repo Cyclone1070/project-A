@@ -11,9 +11,9 @@ interface props {
 }
 
 const TopBar = ({ targetIndex, finalSvg, setFinalSvg, setTransformNode, canvasRef }: props) => {
-    const [finalBar, setFinalBar] = useState(<></>);
+    const basicBar = <div className="basic-bar">Logo Undo Redo</div>;
+    const [finalBar, setFinalBar] = useState(<div className="top-bar">basicBar</div>);
     useEffect(() => {
-        const basicBar = <div className="basic-bar">Logo Undo Redo</div>;
         if (targetIndex !== -1) {
             if (finalSvg[targetIndex].tag === "rect") {
                 setFinalBar(

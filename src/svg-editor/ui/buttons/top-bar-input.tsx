@@ -23,6 +23,10 @@ const TopBarInput = ({
         e.preventDefault();
         setFinalSvg((prev) => {
             const newSvg = [...prev];
+            // double check to fix bug with rotate and delete
+            if (!newSvg[targetIndex]) {
+                return newSvg;
+            }
             if (name === "rotate") {
                 const bbox = (
                     canvasRef.current.children[targetIndex] as SVGGraphicsElement

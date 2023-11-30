@@ -1,9 +1,9 @@
 /* logic behind rect */
-import { Rect } from "../../types";
+import { FinalSvg, Rect } from "../../types";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
 
-const useRect = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>) => {
+const useRect = (setFinalSvg: React.Dispatch<React.SetStateAction<FinalSvg>>) => {
     /* when drag */
     const [tempRect, setTempRect] = useState<Rect>({});
     const [isDragging, setIsDragging] = useState(false);
@@ -46,14 +46,17 @@ const useRect = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>) =>
 
     function finalizeRect() {
         if (isDragging) {
-            setFinalSvg((prevSvg) => {
-                /* check for final visibility */
-                if (tempRect.width !== 0 && tempRect.height !== 0) {
+            /* check for final visibility */
+            if (
+                tempRect.width &&
+                tempRect.height &&
+                tempRect.width !== 0 &&
+                tempRect.height !== 0
+            ) {
+                setFinalSvg((prevSvg) => {
                     return [...prevSvg, tempRect];
-                } else {
-                    return prevSvg;
-                }
-            });
+                });
+            }
         }
         /* reset */
         setTempRect({});

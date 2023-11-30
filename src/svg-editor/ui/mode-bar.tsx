@@ -11,6 +11,9 @@ const ModeBar = ({ setDrawMode, drawMode }: props) => {
             <ModeButton modeSetter={setDrawMode} mode={"transform"} drawMode={drawMode}>
                 Transform
             </ModeButton>
+            <ModeButton modeSetter={setDrawMode} mode={"path"} drawMode={drawMode}>
+                Path
+            </ModeButton>
             <ModeButton modeSetter={setDrawMode} mode={"rect"} drawMode={drawMode}>
                 Rect
             </ModeButton>

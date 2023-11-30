@@ -45,14 +45,12 @@ const useEllipse = (setFinalSvg: React.Dispatch<React.SetStateAction<object[]>>)
 
     function finalizeEllipse() {
         if (isDragging) {
-            setFinalSvg((prevSvg) => {
-                /* check for final visibility */
-                if (tempEllipse.rx !== 0 && tempEllipse.ry !== 0) {
+            /* check for final visibility */
+            if (tempEllipse.rx && tempEllipse.ry && tempEllipse.rx !== 0 && tempEllipse.ry !== 0) {
+                setFinalSvg((prevSvg) => {
                     return [...prevSvg, tempEllipse];
-                } else {
-                    return prevSvg;
-                }
-            });
+                });
+            }
         }
         /* reset */
         setTempEllipse({});
